@@ -50,7 +50,7 @@ void multiplyMatrixes_1(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM
     end = omp_get_wtime();
 	
     elapsed = (double) (end-start) + (double) (end-start) * 1.e-6;
-    printf("Algorithm 2 - elapsed time = %f seconds.\n", elapsed);
+    printf("Algorithm 1 - elapsed time = %f seconds.\n", elapsed);
 }
 
 void multiplyMatrixes_2(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM) {
@@ -85,7 +85,7 @@ void multiplyMatrixes_2(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM
     end = omp_get_wtime();
 	
     elapsed = (double) (end-start) + (double) (end-start) * 1.e-6;
-    printf("Algorithm 1 - elapsed time = %f seconds.\n", elapsed);
+    printf("Algorithm 2 - elapsed time = %f seconds.\n", elapsed);
 }
 
 void printMatrixes(int** A, int** B, int** C, int DIMENSION) {

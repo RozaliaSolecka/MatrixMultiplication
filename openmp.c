@@ -38,7 +38,7 @@ void multiplyMatrixes_1(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM
     omp_set_num_threads(THREAD_NUM);
     start = omp_get_wtime();
 	
-    #pragma omp parallel for private(i,j,k) shared(A,B,C)
+    #pragma omp parallel for schedule(static) private(i,j,k) shared(A,B,C)
     for (i = 0; i < DIMENSION; i++) {
         for (j = 0; j < DIMENSION; j++) {
             for (k = 0; k < DIMENSION; k++) {
@@ -52,6 +52,29 @@ void multiplyMatrixes_1(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM
     elapsed = (double) (end-start) + (double) (end-start) * 1.e-6;
     printf("Algorithm 1 - elapsed time = %f seconds.\n", elapsed);
 }
+void multiplyMatrixes_3(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM) {
+    double elapsed;
+    struct timeval tv1, tv2;
+    struct timezone tz;
+    int i, j, k;
+    double start, end;
+    omp_set_num_threads(THREAD_NUM);
+    start = omp_get_wtime();
+	
+    #pragma omp parallel for schedule(dynamic) private(i,j,k) shared(A,B,C)
+    for (i = 0; i < DIMENSION; i++) {
+        for (j = 0; j < DIMENSION; j++) {
+            for (k = 0; k < DIMENSION; k++) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    end = omp_get_wtime();
+	
+    elapsed = (double) (end-start) + (double) (end-start) * 1.e-6;
+    printf("Algorithm 3 - elapsed time = %f seconds.\n", elapsed);
+}
 
 void multiplyMatrixes_2(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM) {
     double elapsed;
@@ -59,13 +82,14 @@ void multiplyMatrixes_2(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM
     struct timezone tz;
     int i, j;
     double start, end;
+    start = omp_get_wtime();
     
     # pragma omp parallel num_threads(THREAD_NUM) default(none) shared(A,B,C,start) private(i,j) firstprivate(DIMENSION)
     {
-        # pragma omp single
-        {
-        start = omp_get_wtime();
-        }
+        // # pragma omp single
+        // {
+        // start = omp_get_wtime();
+        // }
         # pragma omp single
         {
             for (i = 0; i < DIMENSION; i++) {
@@ -150,6 +174,9 @@ int main(int argc,char **argv) {
     multiplyMatrixes_2(A, B, C, DIMENSION, THREAD_NUM);
     //printMatrixes(A, B, C, DIMENSION);
 
+    clearResults(C, DIMENSION, THREAD_NUM);
+    multiplyMatrixes_3(A, B, C, DIMENSION, THREAD_NUM);
+
     for (int i = 0; i < DIMENSION; i++) {
         free(A[i]);
         free(B[i]);
@@ -161,3 +188,33 @@ int main(int argc,char **argv) {
     free(C);
 	
 }
+
+// Algorithm 1 - elapsed time = 0.001625 seconds.
+// Algorithm 2 - elapsed time = 0.003235 seconds.
+// s175735@des04:~/code$ ./a.out 500 5 0 4
+// Algorithm 1 - elapsed time = 0.143158 seconds.
+// Algorithm 2 - elapsed time = 0.242974 seconds.
+// s175735@des04:~/code$ ./a.out 1000 5 0 4
+// Algorithm 1 - elapsed time = 1.178538 seconds.
+// Algorithm 2 - elapsed time = 1.913624 seconds.
+// s175735@des04:~/code$ ./a.out 1000 5 0 2
+// Algorithm 1 - elapsed time = 2.315167 seconds.
+// Algorithm 2 - elapsed time = 2.520240 seconds.
+// s175735@des04:~/code$ ./a.out 1000 5 0 1
+// Algorithm 1 - elapsed time = 4.530074 seconds.
+// Algorithm 2 - elapsed time = 4.528705 seconds.
+// s175735@des04:~/code$ ./a.out 2000 5 0 4
+// Algorithm 1 - elapsed time = 16.814817 seconds.
+// Algorithm 2 - elapsed time = 22.684467 seconds.
+// s175735@des04:~/code$ ./a.out 1000 5 0 1
+// Algorithm 1 - elapsed time = 4.531463 seconds.
+// Algorithm 2 - elapsed time = 4.521098 seconds.
+// s175735@des04:~/code$ ./a.out 1000 5 0 4
+// Algorithm 1 - elapsed time = 1.209138 seconds.
+// Algorithm 2 - elapsed time = 1.914872 seconds.
+// s175735@des04:~/code$ ./a.out 500 5 0 4
+// Algorithm 1 - elapsed time = 0.151526 seconds.
+// Algorithm 2 - elapsed time = 0.245000 seconds.
+// s175735@des04:~/code$ ./a.out 1000 5 0 4
+// Algorithm 1 - elapsed time = 1.196410 seconds.
+// Algorithm 2 - elapsed time = 1.934618 seconds.

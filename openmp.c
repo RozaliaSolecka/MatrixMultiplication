@@ -4,8 +4,7 @@
 #include <sys/time.h>
 #include <omp.h>
 #include <math.h>
-#define BLOCK_SIZE 128
-#define LOOP_NUMBER 5
+#define LOOP_NUMBER 10
 #define min(x,y) (((x) < (y)) ? (x) : (y))
 
 void initializeMatrixes(int** A, int** B, int** C, int DIMENSION, int RAND_RANGE, int THREAD_NUM) {
@@ -97,6 +96,7 @@ double multiplyMatrixes_2(int** A, int** B, int** C, int DIMENSION, int THREAD_N
 }
 
 double multiplyMatrixes_3(int** A, int** B, int** C, int DIMENSION, int THREAD_NUM) {
+    int BLOCK_SIZE = DIMENSION / THREAD_NUM;
     int i, j, k, ii, jj, kk;
     double elapsed;
     double start, end;
